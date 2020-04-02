@@ -1,6 +1,8 @@
 #pragma once
+#ifdef HAVE_X11
 #include "shared_x11.h"
 #include "loaders/loader_x11.h"
+#endif
 
 #ifndef KeySym
 typedef unsigned long KeySym;
@@ -20,5 +22,12 @@ bool key_is_pressed(KeySym ks) {
     KeyCode kc2 = g_x11->XKeysymToKeycode(get_xdisplay(), ks);
     bool isPressed = !!(keys_return[kc2 >> 3] & (1 << (kc2 & 7)));
     return isPressed;
+}
+#endif
+
+#ifdef _WIN32
+#include <windows.h>
+bool key_is_pressed(KeySym ks) {
+    return GetAsyncKeyState(ks) & 0x8000;
 }
 #endif
