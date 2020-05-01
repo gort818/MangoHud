@@ -1023,9 +1023,6 @@ void position_layer(struct overlay_params& params, ImVec2 window_size)
 
    ImGui::SetNextWindowBgAlpha(params.background_alpha);
    ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
-   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8,-3));
-   ImGui::PushStyleVar(ImGuiStyleVar_Alpha, params.alpha);
 
    switch (params.position) {
    case LAYER_POSITION_TOP_LEFT:
@@ -1142,6 +1139,10 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
    window_size = ImVec2(params.width, params.height);
    unsigned width = ImGui::GetIO().DisplaySize.x;
    unsigned height = ImGui::GetIO().DisplaySize.y;
+   
+   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8,-3));
+   ImGui::PushStyleVar(ImGuiStyleVar_Alpha, params.alpha);
    
    if (!params.no_display){
       ImGui::Begin("Main", &open, ImGuiWindowFlags_NoDecoration);
@@ -1398,6 +1399,7 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
          ImGui::End();
       }
    }
+   ImGui::PopStyleVar(3);
 }
 
 static void compute_swapchain_display(struct swapchain_data *data)
@@ -1412,7 +1414,6 @@ static void compute_swapchain_display(struct swapchain_data *data)
       position_layer(instance_data->params, data->window_size);
       render_imgui(data->sw_stats, instance_data->params, data->window_size, "Vulkan");
    }
-   ImGui::PopStyleVar(3);
 
    ImGui::EndFrame();
    ImGui::Render();
