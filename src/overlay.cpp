@@ -953,13 +953,13 @@ void update_hud_info(struct swapchain_stats& sw_stats, struct overlay_params& pa
             if (vendorID == 0x10de)
                std::thread(getNvidiaGpuInfo).detach();
          }
-
+#ifdef __gnu_linux__
          // get ram usage/max
          if (params.enabled[OVERLAY_PARAM_ENABLED_ram])
             std::thread(update_meminfo).detach();
          if (params.enabled[OVERLAY_PARAM_ENABLED_io_read] || params.enabled[OVERLAY_PARAM_ENABLED_io_write])
             std::thread(getIoStats, &sw_stats.io).detach();
-            
+#endif            
          gpuLoadLog = gpu_info.load;
          cpuLoadLog = sw_stats.total_cpu;
 
