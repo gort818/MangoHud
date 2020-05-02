@@ -1319,9 +1319,11 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
                "%d.%d%s", data.version_gl.major, data.version_gl.minor,
                data.version_gl.is_gles ? " ES" : "");
          }
+#ifdef __gnu_linux__ 
          ImGui::SameLine();
          ImGui::TextColored(engine_color,
                  "/ %s", data.deviceName.c_str());
+#endif
          if (params.enabled[OVERLAY_PARAM_ENABLED_arch]){
             ImGui::Dummy(ImVec2(0.0,5.0f));
             ImGui::TextColored(engine_color, "%s", "" MANGOHUD_ARCH);
