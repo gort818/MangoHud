@@ -2326,7 +2326,7 @@ static VkResult overlay_CreateSwapchainKHR(
    } else if (prop.vendorID == 0x8086) {
       ss << " (" << (prop.driverVersion >> 14);
       ss << "."  << (prop.driverVersion & 0x3fff);
-   }
+   
 #endif
    } else {
       ss << " (" << VK_VERSION_MAJOR(prop.driverVersion);
