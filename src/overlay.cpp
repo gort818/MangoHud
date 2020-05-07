@@ -859,7 +859,30 @@ void init_system_info(){
       trim(gpu);
       driver = exec("glxinfo | grep 'OpenGL version' | sed 's/^.*: //' | cut -d' ' --output-delimiter=$'\n' -f1- | grep -v '(' | grep -v ')' | tr '\n' ' ' | cut -c 1-");
       trim(driver);
+
+//get wine version
+
+      exec ("sleep 1");
+
+      wine_proc = exec ("pgrep -fl wineserver");
+      if (wine_proc == ""){
+        wine="Wine is not running";
+      }
+      else {
+        wine_exe = exec ("ps aux | grep 'wineserver' | head -n1 | awk '{print $11}' | sed 's/server//g'");
+        trim(wine_exe);
+        std::ostringstream out1;
+        out1<< wine_exe << " --version ";
+        wine = exec (out1.str());
+        trim(wine);
+      }
+
       //driver = itox(device_data->properties.driverVersion);
+
+
+
+
+
 
 #ifndef NDEBUG
       std::cout << "Ram:" << ram << "\n"
@@ -867,7 +890,8 @@ void init_system_info(){
                 << "Kernel:" << kernel << "\n"
                 << "Os:" << os << "\n"
                 << "Gpu:" << gpu << "\n"
-                << "Driver:" << driver << std::endl;
+                << "Driver:" << driver << "\n"
+                << "Wine:" <<wine << std::endl;
 #endif
 
       if (!log_period_env || !try_stoi(log_period, log_period_env))
@@ -959,6 +983,7 @@ void update_hud_info(struct swapchain_stats& sw_stats, struct overlay_params& pa
 
          sw_stats.n_frames_since_update = 0;
          sw_stats.last_fps_update = now;
+
 
       }
    } else {
@@ -1072,6 +1097,8 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
          ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.00f), "%s", data.time.c_str());
       }
 
+
+
       ImGui::BeginTable("hud", params.tableCols);
       if (params.enabled[OVERLAY_PARAM_ENABLED_gpu_stats]){
          ImGui::TableNextRow();
@@ -1096,6 +1123,9 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
             ImGui::Text("MHz");
             ImGui::PopFont();
          }
+
+
+
       }
       if(params.enabled[OVERLAY_PARAM_ENABLED_cpu_stats]){
          ImGui::TableNextRow();
@@ -1195,6 +1225,9 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
          ImGui::Text("GB");
          ImGui::PopFont();
       }
+
+
+
       if (params.enabled[OVERLAY_PARAM_ENABLED_fps]){
          ImGui::TableNextRow();
          ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(params.engine_color), "%s", is_vulkan ? engineName.c_str() : "OpenGL");
@@ -1211,6 +1244,8 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
          ImGui::Text("ms");
          ImGui::PopFont();
       }
+
+
       ImGui::EndTable();
 
       if (params.enabled[OVERLAY_PARAM_ENABLED_fps]){
@@ -1283,8 +1318,22 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
          ImGui::Text("%.1f ms", 1000 / data.fps);
          ImGui::PopFont();
       }
+      if (params.enabled[OVERLAY_PARAM_ENABLED_wine]){
+         ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(params.wine_color), "%s","WINE");
+         ImGui::PushFont(data.font1);
+         ImGui::Dummy(ImVec2(0, 8.0f));
+         auto wine_color = ImGui::ColorConvertU32ToFloat4(params.wine_color);
+         ImGui::TextColored(wine_color,
+                            "%s/", wine.c_str());
+         ImGui::PopFont();
+      }
+
       window_size = ImVec2(window_size.x, ImGui::GetCursorPosY() + 10.0f);
       ImGui::End();
+
+
+
+
    }
    if(loggingOn){
       ImGui::SetNextWindowBgAlpha(0.0);

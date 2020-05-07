@@ -185,6 +185,7 @@ parse_path(const char *str)
 #define parse_font_file(s) parse_path(s)
 #define parse_io_read(s) parse_unsigned(s)
 #define parse_io_write(s) parse_unsigned(s)
+#define parse_wine(s) parse_str(s)
 
 #define parse_crosshair_color(s) parse_color(s)
 #define parse_cpu_color(s) parse_color(s)
@@ -196,6 +197,7 @@ parse_path(const char *str)
 #define parse_frametime_color(s) parse_color(s)
 #define parse_background_color(s) parse_color(s)
 #define parse_text_color(s) parse_color(s)
+#define parse_wine_color(s) parse_color(s)
 
 static bool
 parse_help(const char *str)
@@ -321,6 +323,8 @@ parse_overlay_config(struct overlay_params *params,
    params->enabled[OVERLAY_PARAM_ENABLED_cpu_temp] = false;
    params->enabled[OVERLAY_PARAM_ENABLED_gpu_temp] = false;
    params->enabled[OVERLAY_PARAM_ENABLED_cpu_stats] = true;
+   params->enabled[OVERLAY_PARAM_ENABLED_wine] = true;
+   params->enabled[OVERLAY_PARAM_ENABLED_wine] = true;
    params->enabled[OVERLAY_PARAM_ENABLED_gpu_stats] = true;
    params->enabled[OVERLAY_PARAM_ENABLED_ram] = false;
    params->enabled[OVERLAY_PARAM_ENABLED_vram] = false;
@@ -352,6 +356,7 @@ parse_overlay_config(struct overlay_params *params,
    params->frametime_color = strtol("00ff00", NULL, 16);
    params->background_color = strtol("020202", NULL, 16);
    params->text_color = strtol("ffffff", NULL, 16);
+   params->wine_color = strtol("792e97", NULL, 16);
 
    // first pass with env var
    if (env)
@@ -400,7 +405,7 @@ parse_overlay_config(struct overlay_params *params,
    // Command buffer gets reused and timestamps cause hangs for some reason, force off for now
    params->enabled[OVERLAY_PARAM_ENABLED_gpu_timing] = false;
    // Convert from 0xRRGGBB to ImGui's format
-   std::array<unsigned *, 10> colors = {
+   std::array<unsigned *, 11> colors = {
       &params->crosshair_color,
       &params->cpu_color,
       &params->gpu_color,
@@ -411,6 +416,7 @@ parse_overlay_config(struct overlay_params *params,
       &params->background_color,
       &params->frametime_color,
       &params->text_color,
+      &params->wine_color,
    };
 
    for (auto color : colors){

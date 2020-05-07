@@ -57,6 +57,7 @@ extern "C" {
    OVERLAY_PARAM_BOOL(vram)                          \
    OVERLAY_PARAM_BOOL(crosshair)                     \
    OVERLAY_PARAM_BOOL(time)                          \
+   OVERLAY_PARAM_BOOL(wine)                          \
    OVERLAY_PARAM_BOOL(full)                          \
    OVERLAY_PARAM_BOOL(read_cfg)                      \
    OVERLAY_PARAM_BOOL(io_read)                       \
@@ -91,6 +92,7 @@ extern "C" {
    OVERLAY_PARAM_CUSTOM(vram_color)                  \
    OVERLAY_PARAM_CUSTOM(ram_color)                   \
    OVERLAY_PARAM_CUSTOM(engine_color)                \
+   OVERLAY_PARAM_CUSTOM(wine_color)                  \
    OVERLAY_PARAM_CUSTOM(frametime_color)             \
    OVERLAY_PARAM_CUSTOM(background_color)            \
    OVERLAY_PARAM_CUSTOM(io_color)                    \
@@ -132,7 +134,7 @@ struct overlay_params {
    unsigned vsync;
    int gl_vsync;
    int log_duration;
-   unsigned crosshair_color, cpu_color, gpu_color, vram_color, ram_color, engine_color, io_color, frametime_color, background_color, text_color;
+   unsigned crosshair_color, cpu_color, gpu_color, vram_color, ram_color, engine_color, io_color, frametime_color, background_color, text_color, wine_color;
    unsigned tableCols;
    float font_size;
    float background_alpha, alpha;
