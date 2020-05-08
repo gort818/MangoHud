@@ -22,6 +22,7 @@
  */
 
 #include <string.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <thread>
@@ -765,6 +766,24 @@ string exec(string command) {
    return result;
 }
 
+string stdOutWine(string cmd) {
+
+    string data;
+    FILE * stream;
+    const int max_buffer = 256;
+    char buffer[max_buffer];
+    cmd.append(" 2>&1");
+
+    stream = popen(cmd.c_str(), "r");
+    if (stream) {
+      while (!feof(stream))
+        if (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+          pclose(stream);
+      }
+    return data;
+    }
+
+
 void init_cpu_stats(overlay_params& params)
 {
    auto& enabled = params.enabled;
@@ -860,21 +879,25 @@ void init_system_info(){
       driver = exec("glxinfo | grep 'OpenGL version' | sed 's/^.*: //' | cut -d' ' --output-delimiter=$'\n' -f1- | grep -v '(' | grep -v ')' | tr '\n' ' ' | cut -c 1-");
       trim(driver);
 
-//get wine version
 
-      exec ("sleep 1");
+      // Get WINE version
+      wine_proc = exec("pgrep -fl wineserver");
+      if (wine_proc == "") {
+         wine = "Wine is not running";
+      } else {
+         wine_exe = stdOutWine("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}'");
+         trim(wine_exe);
+         if (wine_exe == "/usr/bin/wineserver") {
+            std::cout << "Using System wine\n";
+            trim(wine_exe);
+            std::cout << "THE COMMAND IS" << wine_exe << endl;
+            trim(wine);
+            wine = stdOutWine(" " + wine_exe + " --version");
+         } else {
+            wine = stdOutWine("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}' |  rev | cut -d '/' -f 3 | rev");
+            trim(wine);
+         }
 
-      wine_proc = exec ("pgrep -fl wineserver");
-      if (wine_proc == ""){
-        wine="Wine is not running";
-      }
-      else {
-        wine_exe = exec ("ps aux | grep 'wineserver' | head -n1 | awk '{print $11}' | sed 's/server//g'");
-        trim(wine_exe);
-        std::ostringstream out1;
-        out1<< wine_exe << " --version ";
-        wine = exec (out1.str());
-        trim(wine);
       }
 
       //driver = itox(device_data->properties.driverVersion);
@@ -1324,7 +1347,7 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
          ImGui::Dummy(ImVec2(0, 8.0f));
          auto wine_color = ImGui::ColorConvertU32ToFloat4(params.wine_color);
          ImGui::TextColored(wine_color,
-                            "%s/", wine.c_str());
+                            "%s", wine.c_str());
          ImGui::PopFont();
       }
 
