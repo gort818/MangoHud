@@ -8,7 +8,7 @@
 
 using namespace std;
 
-string os, cpu, gpu, ram, kernel, driver;
+string os, cpu, gpu, ram, kernel, driver,wine;
 bool sysInfoFetched = false;
 int gpuLoadLog = 0, cpuLoadLog = 0, log_period = 0, elapsedLog;
 
@@ -50,7 +50,7 @@ void logging(void *params_void){
   log_start = os_time_get();
   out.open(params->output_file + date, ios::out | ios::app);
   out << "os," << "cpu," << "gpu," << "ram," << "kernel," << "driver" << endl;
-  out << os << "," << cpu << "," << gpu << "," << ram << "," << kernel << "," << driver << endl;
+  out << os << "," << cpu << "," << gpu << "," << ram << "," << kernel << "," << driver << wine << endl;
   out.close();
 
   while (loggingOn){
