@@ -850,6 +850,26 @@ void init_system_info(){
       trim(gpu);
       driver = exec("glxinfo | grep 'OpenGL version' | sed 's/^.*: //' | cut -d' ' --output-delimiter=$'\n' -f1- | grep -v '(' | grep -v ')' | tr '\n' ' ' | cut -c 1-");
       trim(driver);
+
+      // Get WINE version
+      wine_proc = exec("pgrep -fl wineserver");
+      if (wine_proc == "") {
+         wine = "Wine is not running";
+      } else {
+         wine_exe = stdOutWine("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}'");
+         trim(wine_exe);
+         if (wine_exe == "/usr/bin/wineserver") {
+            std::cout << "Using System wine\n";
+            trim(wine_exe);
+            std::cout << "THE COMMAND IS" << wine_exe << endl;
+            trim(wine);
+            wine = stdOutWine(" " + wine_exe + " --version");
+         } else {
+            wine = stdOutWine("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}' |  rev | cut -d '/' -f 3 | rev");
+            trim(wine);
+         }
+
+      }
       //driver = itox(device_data->properties.driverVersion);
 
       if (ld_preload)
@@ -860,7 +880,8 @@ void init_system_info(){
                 << "Kernel:" << kernel << "\n"
                 << "Os:" << os << "\n"
                 << "Gpu:" << gpu << "\n"
-                << "Driver:" << driver << std::endl;
+                << "Driver:" << driver
+                << "Wine:" << wine << std::endl;
 #endif
 
       if (!log_period_env || !try_stoi(log_period, log_period_env))
