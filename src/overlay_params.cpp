@@ -348,7 +348,7 @@ parse_overlay_config(struct overlay_params *params,
    params->frametime_color = strtol("00ff00", NULL, 16);
    params->background_color = strtol("020202", NULL, 16);
    params->text_color = strtol("ffffff", NULL, 16);
-   params->wine_color = strtol("792e97", NULL, 16);
+   params->wine_color = strtol("732010", NULL, 16);
 
 #ifdef HAVE_X11
    params->toggle_hud = XK_F12;

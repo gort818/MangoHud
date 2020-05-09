@@ -699,6 +699,29 @@ string exec(string command) {
    return result;
 }
 
+string stdOutWine(string cmd) {
+
+    string data;
+    FILE * stream;
+    const int max_buffer = 256;
+    char buffer[max_buffer];
+    cmd.append(" 2>&1");
+
+    stream = popen(cmd.c_str(), "r");
+       if (!stream) {
+           return "popen failed!";
+       }
+    if (stream) {
+      while (!feof(stream))
+        if (fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+          pclose(stream);
+      }
+    return data;
+}
+
+
+
+
 void init_cpu_stats(overlay_params& params)
 {
    auto& enabled = params.enabled;
@@ -857,20 +880,19 @@ void init_system_info(){
       if (wine_proc == "") {
          wine = "Wine is not running";
       } else {
-         wine_exe = exec("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}'");
+         wine_exe = stdOutWine("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}'");
          trim(wine_exe);
-         if (wine_exe == "/usr/bin/wineserver" || "/usr/bin/local/wineserver") {
+         if (wine_exe == "/usr/bin/wineserver" || wine_exe == "/usr/local/bin/wineserver") {
             std::cout << "Using System wine\n";
             trim(wine_exe);
             std::cout << "THE COMMAND IS" << wine_exe << endl;
-            wine = exec(" " + wine_exe + " --version");
             trim(wine);
+            wine = stdOutWine(" " + wine_exe + " --version");
          } else {
-            wine = exec("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}' |  rev | cut -d '/' -f 3 | rev");
+            wine = stdOutWine("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}' |  rev | cut -d '/' -f 3 | rev");
             trim(wine);
          }
-
-      }
+        }
       //driver = itox(device_data->properties.driverVersion);
 
       if (ld_preload)
@@ -1315,26 +1337,26 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
          auto engine_color = ImGui::ColorConvertU32ToFloat4(params.engine_color);
          if (is_vulkan) {
             if ((data.engineName == "DXVK" || data.engineName == "VKD3D")){
-               ImGui::TextColored(engine_color,
-                  "%s/%d.%d.%d", data.engineVersion.c_str(),
-                  data.version_vk.major,
-                  data.version_vk.minor,
-                  data.version_vk.patch);
+                ImGui::TextColored(engine_color,
+                   "%s", data.engineVersion.c_str());
+               //    data.version_vk.major,
+               //    data.version_vk.minor,
+               //    data.version_vk.patch);
             } else {
-               ImGui::TextColored(engine_color,
-                  "%d.%d.%d",
-                  data.version_vk.major,
-                  data.version_vk.minor,
-                  data.version_vk.patch);
+               // ImGui::TextColored(engine_color,
+               //    "%d.%d.%d",
+               //    data.version_vk.major,
+               //    data.version_vk.minor,
+               //    data.version_vk.patch);
             }
          } else {
             ImGui::TextColored(engine_color,
                "%d.%d%s", data.version_gl.major, data.version_gl.minor,
                data.version_gl.is_gles ? " ES" : "");
          }
-         ImGui::SameLine();
-         ImGui::TextColored(engine_color,
-                 "/ %s", data.deviceName.c_str());
+         // ImGui::SameLine();
+         // ImGui::TextColored(engine_color,
+         //         "/ %s", data.deviceName.c_str());
          if (params.enabled[OVERLAY_PARAM_ENABLED_arch]){
             ImGui::Dummy(ImVec2(0.0,5.0f));
             ImGui::TextColored(engine_color, "%s", "" MANGOHUD_ARCH);
@@ -1345,7 +1367,7 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
         if (params.enabled[OVERLAY_PARAM_ENABLED_wine]){
            ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(params.wine_color), "%s","WINE");
            ImGui::PushFont(data.font1);
-           //ImGui::Dummy(ImVec2(0, 8.0f));
+           ImGui::Dummy(ImVec2(0, 8.0f));
            auto wine_color = ImGui::ColorConvertU32ToFloat4(params.wine_color);
            ImGui::TextColored(wine_color, "%s", wine.c_str());
            ImGui::PopFont();
