@@ -193,6 +193,7 @@ parse_path(const char *str)
 #define parse_frametime_color(s) parse_color(s)
 #define parse_background_color(s) parse_color(s)
 #define parse_text_color(s) parse_color(s)
+#define parse_wine_color(s) parse_color(s)
 
 static bool
 parse_help(const char *str)
@@ -324,6 +325,7 @@ parse_overlay_config(struct overlay_params *params,
    params->enabled[OVERLAY_PARAM_ENABLED_read_cfg] = false;
    params->enabled[OVERLAY_PARAM_ENABLED_io_read] = false;
    params->enabled[OVERLAY_PARAM_ENABLED_io_write] = false;
+   params->enabled[OVERLAY_PARAM_ENABLED_wine] = false;
    params->fps_sampling_period = 500000; /* 500ms */
    params->width = 280;
    params->height = 140;
@@ -346,6 +348,7 @@ parse_overlay_config(struct overlay_params *params,
    params->frametime_color = strtol("00ff00", NULL, 16);
    params->background_color = strtol("020202", NULL, 16);
    params->text_color = strtol("ffffff", NULL, 16);
+   params->wine_color = strtol("792e97", NULL, 16);
 
 #ifdef HAVE_X11
    params->toggle_hud = XK_F12;
@@ -398,7 +401,7 @@ parse_overlay_config(struct overlay_params *params,
       parse_overlay_env(params, env);
 
    // Convert from 0xRRGGBB to ImGui's format
-   std::array<unsigned *, 10> colors = {
+   std::array<unsigned *, 11> colors = {
       &params->crosshair_color,
       &params->cpu_color,
       &params->gpu_color,
@@ -409,6 +412,7 @@ parse_overlay_config(struct overlay_params *params,
       &params->background_color,
       &params->frametime_color,
       &params->text_color,
+      &params->wine_color,
    };
 
    for (auto color : colors){

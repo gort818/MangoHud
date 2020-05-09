@@ -852,20 +852,21 @@ void init_system_info(){
       trim(driver);
 
       // Get WINE version
+      string wine_proc, wine_exe;
       wine_proc = exec("pgrep -fl wineserver");
       if (wine_proc == "") {
          wine = "Wine is not running";
       } else {
-         wine_exe = stdOutWine("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}'");
+         wine_exe = exec("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}'");
          trim(wine_exe);
-         if (wine_exe == "/usr/bin/wineserver") {
+         if (wine_exe == "/usr/bin/wineserver" || "/usr/bin/local/wineserver") {
             std::cout << "Using System wine\n";
             trim(wine_exe);
             std::cout << "THE COMMAND IS" << wine_exe << endl;
+            wine = exec(" " + wine_exe + " --version");
             trim(wine);
-            wine = stdOutWine(" " + wine_exe + " --version");
          } else {
-            wine = stdOutWine("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}' |  rev | cut -d '/' -f 3 | rev");
+            wine = exec("/usr/bin/pgrep -fla wineserver |awk '{print $2}'| awk 'NR==1{print $1}' |  rev | cut -d '/' -f 3 | rev");
             trim(wine);
          }
 
@@ -1339,6 +1340,15 @@ void render_imgui(swapchain_stats& data, struct overlay_params& params, ImVec2& 
             ImGui::TextColored(engine_color, "%s", "" MANGOHUD_ARCH);
          }
          ImGui::PopFont();
+      }
+
+        if (params.enabled[OVERLAY_PARAM_ENABLED_wine]){
+           ImGui::TextColored(ImGui::ColorConvertU32ToFloat4(params.wine_color), "%s","WINE");
+           ImGui::PushFont(data.font1);
+           //ImGui::Dummy(ImVec2(0, 8.0f));
+           auto wine_color = ImGui::ColorConvertU32ToFloat4(params.wine_color);
+           ImGui::TextColored(wine_color, "%s", wine.c_str());
+           ImGui::PopFont();
       }
 
       if (loggingOn && log_period == 0){

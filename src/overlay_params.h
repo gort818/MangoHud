@@ -43,6 +43,7 @@ typedef unsigned long KeySym;
    OVERLAY_PARAM_BOOL(arch)                          \
    OVERLAY_PARAM_BOOL(media_player)                  \
    OVERLAY_PARAM_BOOL(version)                       \
+   OVERLAY_PARAM_BOOL(wine)                          \
    OVERLAY_PARAM_CUSTOM(fps_sampling_period)         \
    OVERLAY_PARAM_CUSTOM(output_file)                 \
    OVERLAY_PARAM_CUSTOM(font_file)                   \
@@ -75,6 +76,7 @@ typedef unsigned long KeySym;
    OVERLAY_PARAM_CUSTOM(background_color)            \
    OVERLAY_PARAM_CUSTOM(io_color)                    \
    OVERLAY_PARAM_CUSTOM(text_color)                  \
+   OVERLAY_PARAM_CUSTOM(wine_color)                  \
    OVERLAY_PARAM_CUSTOM(alpha)                       \
    OVERLAY_PARAM_CUSTOM(log_duration)                \
    OVERLAY_PARAM_CUSTOM(pci_dev)                     \
@@ -118,7 +120,7 @@ struct overlay_params {
    unsigned vsync;
    int gl_vsync;
    int log_duration;
-   unsigned crosshair_color, cpu_color, gpu_color, vram_color, ram_color, engine_color, io_color, frametime_color, background_color, text_color;
+   unsigned crosshair_color, cpu_color, gpu_color, vram_color, ram_color, engine_color, io_color, frametime_color, background_color, text_color,wine_color;
    unsigned tableCols;
    float font_size;
    float background_alpha, alpha;
